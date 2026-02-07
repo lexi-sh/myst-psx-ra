@@ -79,15 +79,23 @@ function wallSafeTensValue() => byte(0x1CBEEC)
 // $1E2BD4: 16 bit Pointer to Image on Screen
 function mystPtr() => word(0x1cb5c4)
 
-function notDemo() => mystPtr() != 10787
+function notDemo() => mystPtr() != 0x2a23
 
 function hiddenPathRevealed() => byte(0x1cbdfc) == 01
+
+catherine_note_screen_1 = 0x27fe
+catherine_note_screen_2 = 0x084b
+note_screen = 0x1f8f
 
 achievement(
     title = "Catherine...", points = 1, type="progression",
     description = "See the note left for Catherine on the ground",
     id = 573090, badge = "00000", published = "1/12/2026 4:07:54 PM", modified = "1/12/2026 4:07:54 PM",
-    trigger = (tbyte(0x1FFAE8) == 504 || tbyte(0x1FFAE8) == 212) && prev(tbyte(0x1FFAE8)) != tbyte(0x1FFAE8)
+    trigger = (
+        notDemo() &&
+        (prev(mystPtr()) == catherine_note_screen_1 || prev(mystPtr()) == catherine_note_screen_2)
+        && mystPtr() == note_screen
+    )
 )
 
 achievement(
