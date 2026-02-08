@@ -77,7 +77,7 @@ function wallSafeOnesValue() => byte(0x1CBEE8)
 function wallSafeTensValue() => byte(0x1CBEEC)
 
 // $1E2BD4: 16 bit Pointer to Image on Screen
-function mystPtr() => word(0x1cb5c4)
+function mystPtr() => word(0x1ccc2c)
 
 function mechPtr() => word(0x1dd8ec)
 
@@ -87,28 +87,24 @@ function mechanicalButton1() => byte(0x1cc88e)
 function mechanicalButton2() => byte(0x1cc892)
 function mechanicalButton3() => byte(0x1cc896)
 function mechanicalButton4() => byte(0x1cc89a)
-function mechanicalChecker() => byte(0x1ddaf4)
+function mechanicalIsAvailableToEnter() => byte(0x1cbe04) == 1
+
+function newGameStart() => word(0x1d18a0) // 0001, -> aaac -> 0000 means new game
+
 function notDemo() => mystPtr() != 0x2a23
 
 function hiddenPathRevealed() => byte(0x1cbdfc) == 01
 
-function ckPMyst(screen) => screen == prev(mystPtr())
-function ckMyst(screen) => screen == mystPtr()
-function ckPMech(screen) => screen == prev(mechPtr())
-function ckMech(screen) => screen == mechPtr()
 
-
-
-catherine_note_screens = [0x1ede, 0x0e14, 0x084b, 0x24f1, 0x225a, 0x6573, 0x654f]
-note_pickup_screens = [0x1f8f, 0x25b0]
+function catherineNote1() => mystPtr() == 0x6573 && prev(mystPtr()) == 0x1f8f
+function catherineNote2() => mystPtr() == 0x654f && prev(mystPtr()) == 0x25b0
 
 achievement(
     title = "Catherine...", points = 1, type="progression",
     description = "See the note left for Catherine on the ground",
     id = 573090, badge = "00000", published = "1/12/2026 4:07:54 PM", modified = "1/12/2026 4:07:54 PM",
     trigger = (
-        tally_of(catherine_note_screens, 1, ckPMyst) &&
-        tally_of(note_pickup_screens, 1, ckMyst)
+        catherineNote1() || catherineNote2()
     )
 )
 
@@ -130,10 +126,10 @@ achievement(
 )
 
 achievement(
-    title = "What Was it All For?", points = 0,
+    title = "What Was it All For?", points = 5,
     description = "Enter Mechanical",
-    trigger = (notDemo() && mystPtr() == 0xa8d5
-    && mechPtr() == 0x24a0)
+    trigger = (notDemo() && mystPtr() == 0x4120
+        && mechPtr() == 0x24a0 && mechanicalIsAvailableToEnter())
 )
 
 achievement(
@@ -143,7 +139,7 @@ achievement(
         mechanicalButton2() == 8 &&
         mechanicalButton3() == 5 &&
         mechanicalButton4() == 1 &&
-        mechanicalChecker() == 1)
+        mechPtr() == 0x2814)
 )
 
 achievement(
@@ -241,7 +237,9 @@ achievement(
 achievement(
     title = "No Whammies", points = 0, type="missable",
     description = "Get into the rocket without blowing the fuses once",
-    trigger = always_false()
+    trigger = (
+        always_false()
+    )
 )
 
 achievement(
