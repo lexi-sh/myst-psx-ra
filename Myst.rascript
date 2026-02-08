@@ -92,26 +92,35 @@ function notDemo() => mystPtr() != 0x2a23
 
 function hiddenPathRevealed() => byte(0x1cbdfc) == 01
 
-catherine_note_screen_1 = 0x27fe
-catherine_note_screen_2 = 0x084b
-note_screen = 0x1f8f
+function ckPMyst(screen) => screen == prev(mystPtr())
+function ckMyst(screen) => screen == mystPtr()
+function ckPMech(screen) => screen == prev(mechPtr())
+function ckMech(screen) => screen == mechPtr()
+
+
+
+catherine_note_screens = [0x1ede, 0x0e14, 0x084b, 0x24f1, 0x225a, 0x6573, 0x654f]
+note_pickup_screens = [0x1f8f, 0x25b0]
 
 achievement(
     title = "Catherine...", points = 1, type="progression",
     description = "See the note left for Catherine on the ground",
     id = 573090, badge = "00000", published = "1/12/2026 4:07:54 PM", modified = "1/12/2026 4:07:54 PM",
     trigger = (
-        notDemo() &&
-        (prev(mystPtr()) == catherine_note_screen_1 || prev(mystPtr()) == catherine_note_screen_2)
-        && mystPtr() == note_screen
+        tally_of(catherine_note_screens, 1, ckPMyst) &&
+        tally_of(note_pickup_screens, 1, ckMyst)
     )
 )
+
+
+function hologramProjectorState() => byte(0x1cc012)
 
 achievement(
     title = "Something Terrible Has Happened", points = 1,
     description = "See the hidden message from Atrus",
     id = 573091, badge = "00000", published = "1/12/2026 4:07:54 PM", modified = "1/12/2026 4:07:54 PM",
-    trigger = (numberOnThePanelInTheVideoRoom() == 8 && prev(tbyte(0x1FFAE8)) != tbyte(0x1FFAE8) && tbyte(0x1FFAE8) == 165432)
+    trigger = (notDemo() && numberOnThePanelInTheVideoRoom() == 8 && 
+        hologramProjectorState() == 1 && prev(hologramProjectorState() == 0))
 )
 
 achievement(
