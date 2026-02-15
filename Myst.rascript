@@ -78,8 +78,8 @@ function wallSafeTensValue() => byte(0x1CBEEC)
 
 // $1E2BD4: 16 bit Pointer to Image on Screen
 function mystPtr() => word(0x1ccc2c)
-
 function mechPtr() => word(0x1dd8ec)
+function stonePtr() => word(0x1ddb28)
 
 function hiddenPathRevealed() => byte(0x1cbdfc) == 01
 
@@ -105,7 +105,7 @@ achievement(
     id = 573090, badge = "00000", published = "1/12/2026 4:07:54 PM", modified = "1/12/2026 4:07:54 PM",
     trigger = (
         catherineNote1() || catherineNote2()
-    )
+    ) && notDemo()
 )
 
 
@@ -139,7 +139,7 @@ achievement(
         mechanicalButton2() == 8 &&
         mechanicalButton3() == 5 &&
         mechanicalButton4() == 1 &&
-        mechPtr() == 0x2814)
+        mechPtr() == 0x2814) && notDemo()
 )
 
 achievement(
@@ -155,21 +155,23 @@ achievement(
 )
 
 achievement(
-    title = "Ahoy Matey", points = 0,
+    title = "Ahoy Matey", points = 5,
     description = "Enter Stoneship",
-    trigger = always_false()
+    trigger = stonePtr() == 0xfd6c && notDemo()
 )
 
 achievement(
-    title = "Land Ho", points = 0,
+    title = "Land Ho", points = 10,
     description = "Find your way back from Stoneship",
-    trigger = always_false()
+    trigger = stonePtr() == 0x0134
 )
 
+
 achievement(
-    title = "Now We're Cooking with Gas", points = 0,
+    title = "Now We're Cooking with Gas", points = 5,
     description = "Enter Channelwood",
-    trigger = always_false()
+    trigger =  prev(mystPtr()) == 0x2f14 && notDemo() && mystPtr() == 0x6c50   
+        && prev(mystPtr()) != mystPtr()
 )
 
 achievement(
@@ -259,3 +261,4 @@ achievement(
     title = "Why's it Always Gotta be...", points = 2, description = "Get bitten by a snake?",
     trigger = prev(mechPtr2()) == 0x311a && notDemo() && mechPtr2() == 0x641a
 )
+
