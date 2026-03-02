@@ -137,42 +137,33 @@ achievement(
     trigger = numRedPagesInserted() > 0
 )
 
-function finalRedPageEnding() => imagePtr() == 0x00011e22
-
-function finalBluePageEnding() => imagePtr() == 0x000119c9
-
-achievement(
-    title = "That Doesn't Seem Right...", points = 10, type="win_condition",
-    description = "Finish the game with a bad ending",
-    trigger = notDemo() && (finalRedPageEnding() || finalBluePageEnding())
-)
-
 function pageInHand() => byte(0x1cbdb8)
 function interactable() => word(0x07054c)
+function finalRedPageEnding() => imagePtr() == 0x00011e22
+function finalBluePageEnding() => imagePtr() == 0x000119c9
+
 
 achievement(
     title = "You've Done the Right Thing", points = 25, type="win_condition",
-    description = "Finish the game with the good ending",
+    description = "Rescue Atrus",
     trigger = prev(pageInHand()) == 0x1e && imagePtr() == 0x000012e8 && interactable() == 0xafcd
 )
 
 achievement(
-    title = "Do I trust him...? (Blue)", points = 10,
+    title = "Blue Static", points = 10, type="win_condition",
     description = "Complete the blue book",
-    trigger = numBluePagesInserted() == 5
+    trigger = numBluePagesInserted() == 5 && finalBluePageEnding()
 )
 
-function redBookPages() => byte(0x0706cc)
-
 achievement(
-    title = "Do I trust him...? (Red)", points = 10,
+    title = "Red Static", points = 10, type="win_condition",
     description = "Complete the red book",
-    trigger = numRedPagesInserted() == 5
+    trigger = numRedPagesInserted() == 5 && finalRedPageEnding()
 )
 
 achievement(
     title = "The Page...?", points = 10, type="win_condition",
-    description = "Forget to bring the page before entering the final book",
+    description = "Get stuck in D'ni",
     trigger = imagePtr() == 0x000012e8 && interactable() == 0xafcc
 )
 
