@@ -28,6 +28,8 @@ function hiddenPathRevealed() => byte(0x1cbdfc) == 01
 function catherineNote1() => imagePtr() == 0x00006573 && prev(imagePtr()) == 0x1f8f
 function catherineNote2() => imagePtr() == 0x0001654f && prev(imagePtr()) == 0x25b0
 
+function returnedToMyst(prev) => imagePtr() == 0xabf2 && prev(imagePtr() == prev)
+
 achievement(
     title = "Catherine...", points = 1, type="progression",
     description = "See the note left for Catherine on the ground",
@@ -76,13 +78,16 @@ achievement(
 achievement(
     title = "We're Jammin'", points = 5,
     description = "Enter Selenetic",
-    trigger = always_false()
+    trigger = imagePtr() == 0xb050
 )
+
+
+function endOfSelenetic() => imagePtr() == 0xe882 && prev(imagePtr()) == 0xe76a && byte(0x1cc1ba) == 0x1d
 
 achievement(
     title = "Give your Ears a Break", points = 0,
     description = "Find your way back from Selenetic",
-    trigger = always_false()
+    trigger = once(endOfSelenetic())
 )
 
 function stoneshipHasRisen() => byte(0x1cbe00) == 1
@@ -98,7 +103,7 @@ function stoneship135degPressed() => byte(0x1cc072) == 1
 achievement(
     title = "Land Ho", points = 10,
     description = "Find your way back from Stoneship",
-    trigger = imagePtr() == 0xabf2 && prev(imagePtr()) == 0x3d33 && notDemo() && once(stoneship135degPressed())
+    trigger = once(stoneship135degPressed()) && returnedToMyst(0x3d33)
 )
 
 
@@ -109,9 +114,9 @@ achievement(
 )
 
 achievement(
-    title = "A Swamp for You and Me", points = 0,
+    title = "A Swamp for You and Me", points = 10,
     description = "Find your way back from Channelwood",
-    trigger = imagePtr() == 0xabf2 && prev(imagePtr()) == 0x18a1e && notDemo()
+    trigger = returnedToMyst(0x18a1e)
 )
 
 
@@ -167,15 +172,23 @@ achievement(
     trigger = imagePtr() == 0x000012e8 && interactable() == 0xafcc
 )
 
+/* 
+    imageptr = 0xd5a5 => Start over. 
+    0x1cc1ba is a number that counts from 01 to 1d as the player moves along the correct maze path
+    0x1cc1c2 is a number that represents the last room the user came from, with some reset logic on incorrect paths
+    
+    If these two memory locations ever equal each other, we know the user has hit an incorrect path, so ResetIf.
+*/
 achievement(
     title = "Am I hearing Things?", points = 10,
     description = "Make your way through the maze without having to backtrack once",
-    trigger = always_false()
+    trigger = once(imagePtr() == 0xd5a5) && never(byte(0x1cc1ba) == byte(0x1cc1c2)) 
+        && endOfSelenetic()
 )
 
 achievement(
     title = "When Does Riven Come Out?", points = 25, type="missable",
-    description = "Finish the game with the good ending in under 4 minutes",
+    description = "Rescue Atrus in under 4 minutes",
     trigger = always_false()
 )
 
