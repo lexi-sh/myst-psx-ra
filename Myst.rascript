@@ -252,8 +252,9 @@ leaderboard("Rescue Atrus", "", atBeginningOfGame(), shouldStopLeaderboard(), go
 
 achievement(
     title = "When Does Riven Come Out?", points = 25, type="missable",
-    description = "Rescue Atrus in under 4 minutes",
-    trigger = always_false()
+    description = "Rescue Atrus in under 8 minutes (from a clean reset)",
+    trigger = once(atBeginningOfGame()) && unless(tally(60 * 60 * 8, shouldTickTimer())) && goodEnding() 
+    && disable_when((byte(0x0706c0) == 0x0f || byte(0x0706c0) == 0x11))
 )
 
 
