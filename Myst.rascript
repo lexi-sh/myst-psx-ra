@@ -20,9 +20,13 @@ function numRedPagesInserted() => byte(0x0706cc)
 
 
 
-function notDemo() => word(0x070434) != 0x090c
+function notDemo() => imagePtr() != 0x232e
 
 function hiddenPathRevealed() => byte(0x1cbdfc) == 01
+
+function newGame() => prev(imagePtr()) == 0x232a && imagePtr() == 0x2090
+function onQuitScreen() => imagePtr() == 0x232a
+
 
 
 function catherineNote1() => imagePtr() == 0x00006573 && prev(imagePtr()) == 0x1f8f
@@ -82,10 +86,10 @@ achievement(
 )
 
 
-function endOfSelenetic() => imagePtr() == 0xe882 && prev(imagePtr()) == 0xe76a && byte(0x1cc1ba) == 0x1d
+function endOfSelenetic() => imagePtr() == 0xe882 && prev(imagePtr()) == 0xe76a && byte(0x1cc1ba) == 0x0d
 
 achievement(
-    title = "Give your Ears a Break", points = 0,
+    title = "Give your Ears a Break", points = 10,
     description = "Find your way back from Selenetic",
     trigger = once(endOfSelenetic())
 )
@@ -130,40 +134,69 @@ achievement(
     trigger = once(seeingLeftPage()) && once(seeingRightPage())
 )
 
+/*
+Which page is in hand?
+  0a == initial blue
+  14 == initial red
+  0d == mech blue
+  17 == mech red
+  16 == channelwood red
+  0c == channelwood blue
+  19 == selenetic red
+  0f == selenetic blue
+  18 == stoneship red
+  0e == stoneship blue
+  0b == final blue
+  15 == final red
+  1e == green page
+*/
+function pageInHand() => byte(0x1cbdb8)
+
+
 achievement(
     title = "Blue Static", points = 2,
     description = "Insert a blue page into the book in the library",
-    trigger = numBluePagesInserted() > 0
+    trigger = numBluePagesInserted() > 0 && (
+        prev(pageInHand() == 0x0a) ||
+        prev(pageInHand() == 0x0b) ||
+        prev(pageInHand() == 0x0c) ||
+        prev(pageInHand() == 0x0d) ||
+        prev(pageInHand() == 0x0e))
 )
 
 achievement(
     title = "Red Static", points = 2,
     description = "Insert a red page into the book in the library",
-    trigger = numRedPagesInserted() > 0
+    trigger = numRedPagesInserted() > 0  && (
+        prev(pageInHand() == 0x14) ||
+        prev(pageInHand() == 0x15) ||
+        prev(pageInHand() == 0x16) ||
+        prev(pageInHand() == 0x17) ||
+        prev(pageInHand() == 0x18))
 )
 
-function pageInHand() => byte(0x1cbdb8)
 function interactable() => word(0x07054c)
 function finalRedPageEnding() => imagePtr() == 0x00011e22
 function finalBluePageEnding() => imagePtr() == 0x000119c9
 
+function goodEnding() => prev(pageInHand()) == 0x1e && imagePtr() == 0x000012e8 && interactable() == 0xafcd
 
 achievement(
     title = "You've Done the Right Thing", points = 25, type="win_condition",
     description = "Rescue Atrus",
-    trigger = prev(pageInHand()) == 0x1e && imagePtr() == 0x000012e8 && interactable() == 0xafcd
+    trigger = goodEnding()
 )
 
 achievement(
-    title = "Blue Static", points = 10, type="win_condition",
+    title = "Blue Clarity", points = 10, type="win_condition",
     description = "Complete the blue book",
-    trigger = numBluePagesInserted() == 5 && finalBluePageEnding()
+    trigger = finalBluePageEnding() && prev(pageInHand()) == 0x0b
 )
 
 achievement(
-    title = "Red Static", points = 10, type="win_condition",
+    title = "Red Clarity", points = 10, type="win_condition",
     description = "Complete the red book",
-    trigger = numRedPagesInserted() == 5 && finalRedPageEnding()
+    trigger = finalRedPageEnding() && prev(pageInHand()) == 0x15
 )
 
 achievement(
@@ -182,9 +215,40 @@ achievement(
 achievement(
     title = "Am I hearing Things?", points = 10,
     description = "Make your way through the maze without having to backtrack once",
-    trigger = once(imagePtr() == 0xd5a5) && never(byte(0x1cc1ba) == byte(0x1cc1c2)) 
+    trigger = once(imagePtr() == 0xb461) && never(byte(0x1cc1ba) == byte(0x1cc1c2)) 
         && endOfSelenetic()
 )
+
+function atBeginningOfGame() {
+    check = word(0x1d18a0)
+    switch1 = byte(0x1cbe08)
+    switch2 = byte(0x1cbe09)
+    switch3 = byte(0x1cbe0a)
+    switch4 = byte(0x1cbe0b)
+    switch5 = byte(0x1cbe0c)
+    switch6 = byte(0x1cbe0d)
+    switch7 = byte(0x1cbe0e)
+    switch8 = byte(0x1cbe0f)
+    return word(0x1d18a0) == 0 && 
+        prev(word(0x1d18a0)) == 0xaaac &&
+        switch1 == 0 &&
+        switch2 == 0 &&
+        switch3 == 0 &&
+        switch4 == 0 &&
+        switch5 == 0 &&
+        switch6 == 0 &&
+        switch7 == 0 &&
+        switch8 == 0
+}
+
+function shouldTickTimer() {
+    return dword(0x070620) == 0xffffffff
+}
+
+function shouldStopLeaderboard() => (byte(0x0706c0) == 0x0f || byte(0x0706c0) == 0x11) && !atBeginningOfGame()
+
+leaderboard("Rescue Atrus", "", atBeginningOfGame(), shouldStopLeaderboard(), goodEnding(), shouldTickTimer(), format="FRAMES", lower_is_better=true)
+
 
 achievement(
     title = "When Does Riven Come Out?", points = 25, type="missable",
