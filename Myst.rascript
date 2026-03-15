@@ -19,7 +19,6 @@ function numBluePagesInserted() => byte(0x0706d0)
 function numRedPagesInserted() => byte(0x0706cc)
 
 
-
 function notDemo() => imagePtr() != 0x232e
 
 function hiddenPathRevealed() => byte(0x1cbdfc) == 01
@@ -30,12 +29,18 @@ function onQuitScreen() => imagePtr() == 0x232a
 
 function interactable() => word(0x07054c)
 
-function catherineNote1() => imagePtr() == 0x00006573 && prev(imagePtr()) == 0x1f8f
-function catherineNote2() => imagePtr() == 0x0001654f && prev(imagePtr()) == 0x25b0
+function inMyst() => dword(0x070438) == 0xabb112a5
+function inChan() => dword(0x070438) == 0x0ffb570d
+function inSel() => dword(0x070438) == 0x4d4cbfd6
+function inMech() => dword(0x070438) == 0xaeb4b6bb
+function inShip() => dword(0x070438) == 0xabb112a5
 
-function returnedToMyst(p) => imagePtr() == 0xabf2 && prev(imagePtr() == p)
+
+function returnedToMyst(p) => imagePtr() == 0xabf2 && prev(imagePtr() == p) && inMyst()
 
 function pn(ptr, val) => ptr == val && prev(ptr) != val
+
+function isOnTitleScreen() => imagePtr() == 0x232a || imagePtr() == 0x232e
 
 /*
 Which page is in hand?
@@ -55,13 +60,15 @@ Which page is in hand?
 */
 function pageInHand() => byte(0x1cbdb8)
 
+function catherineNote1() => imagePtr() == 0x00006573 && prev(imagePtr()) == 0x1f8f
+function catherineNote2() => imagePtr() == 0x0001654f && prev(imagePtr()) == 0x25b0
 achievement(
     title = "Catherine...", points = 1,
     description = "See the note left for Catherine on the ground",
     id = 573090, badge = "672480",
     trigger = (
         catherineNote1() || catherineNote2()
-    ) && notDemo()
+    ) && inMyst() 
 )
 
 
@@ -123,8 +130,9 @@ function throne1() => pn(imagePtr(), 0xab30) && notDemo()
 function throne2() => pn(imagePtr(), 0xa7d6) && notDemo()
 
 achievement(
-    title = "You Sit on a Throne of Lies", points = 3,  badge="672642", description = "Sit upon the brothers' thrones", id=592345,
-    trigger = once(throne1()) && once(throne2())
+    title = "You Sit on a Throne of Lies", points = 3,  badge="672642", 
+    description = "In a single session, sit upon the brothers' thrones", id=592345,
+    trigger = once(throne1()) && once(throne2()) && never(isOnTitleScreen()) && inMech()
 )
 
 function mechPuzzleSolveButton() => word(0x070cd8)
@@ -142,7 +150,7 @@ achievement(
 achievement(
     title = "I Hear Only Silence", points = 5, id=590876, badge="672643",
     description = "Enter Selenetic",
-    trigger = pn(imagePtr(), 0xb050) && notDemo()
+    trigger = pn(imagePtr(), 0xb050) && notDemo() && inSel()
 )
 
 
@@ -151,7 +159,7 @@ function endOfSelenetic() => imagePtr() == 0xe882 && prev(imagePtr()) == 0xe76a 
 achievement(
     title = "Give your Ears a Break", points = 10, id=590877, badge="672487",
     description = "Find your way back from Selenetic",
-    trigger = once(endOfSelenetic())
+    trigger = endOfSelenetic() && inSel()
 )
 
 
@@ -163,7 +171,7 @@ achievement(
     If these two memory locations ever equal each other, we know the user has hit an incorrect path, so ResetIf.
 */
 achievement(
-    title = "It's Like Music to my Ears", points = 10, id=590889, badge="672488",
+    title = "It's like Music to My Ears", points = 10, id=590889, badge="672488",
     description = "Make your way through the maze without having to backtrack once",
     trigger = once(imagePtr() == 0xb461) && 
          never(byte(0x1cc1ba) == byte(0x1cc1c2) && byte(0x1cc1c2) > 0 && byte(0x1cc1ba) > 0) && trigger_when(endOfSelenetic())
@@ -186,9 +194,9 @@ achievement(
 
 
 achievement(
-    title = "The Humans and Tree-dwellers", points = 5, id=590880,
+    title = "The Humans and Tree-Dwellers", points = 5, id=590880,
     description = "Enter Channelwood", badge="672644",
-    trigger =  prev(imagePtr()) == 0x00012f14 && notDemo() && imagePtr() == 0x6f51
+    trigger =  prev(imagePtr()) == 0x00012f14 && notDemo() && imagePtr() == 0x6f51 && inChan()
 )
 
 function seeingLeftPage() => pn(imagePtr(), 0xc24f) && byte(0x1cc142) == 6
@@ -286,8 +294,15 @@ leaderboard("Rescue Atrus", "", atBeginningOfGame(), shouldStopLeaderboard(), go
 
 achievement( 
     title = "When Does Riven Come Out?", points = 25, type="missable", id=592334,
-    description = "Rescue Atrus in under 8 minutes (from a clean reset)", badge="672647",
-    trigger = once(atBeginningOfGame()) && unless(tally(60 * 60 * 88, shouldTickTimer())) && goodEnding() 
-    && disable_when((byte(0x0706c0) == 0x0f || byte(0x0706c0) == 0x11))
+    description = "Rescue Atrus in under 8 minutes", badge="672647",
+    trigger = 
+        goodEnding() && 
+        disable_when(
+            (
+                once(byte(0x0706c0) == 0x0f) || 
+                once(byte(0x0706c0) == 0x11) || 
+                tally(60 * 60 * 8, shouldTickTimer())),
+            atBeginningOfGame()
+        ) 
 )
 
