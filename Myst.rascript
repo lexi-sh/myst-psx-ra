@@ -154,12 +154,12 @@ achievement(
 )
 
 
-function endOfSelenetic() => imagePtr() == 0xe882 && prev(imagePtr()) == 0xe76a && byte(0x1cc1ba) == 0x0d
+function endOfSelenetic() => returnedToMyst(0xea16) && byte(0x1cc1ba) == 0x0d
 
 achievement(
     title = "Give Your Ears a Break", points = 10, id=590877, badge="672487",
     description = "Find your way back from Selenetic",
-    trigger = endOfSelenetic() && inSel()
+    trigger = endOfSelenetic()
 )
 
 
@@ -253,6 +253,12 @@ achievement(
     title = "You've Done the Right Thing", points = 25, type="win_condition", id=590885,
     description = "Rescue Atrus", badge="672494",
     trigger = goodEnding()
+)
+
+achievement(
+    title = "There's No Place Like Home", points = 5, id=595547,
+    description = "Find your way back to Myst from D'ni", badge="675489",
+    trigger = returnedToMyst(0x2b50)
 )
 
 
