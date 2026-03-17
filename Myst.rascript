@@ -112,7 +112,7 @@ achievement(
 )
 
 achievement(
-    title = "The Sky Here is Dark and Gray", points = 5, id=582342, badge="672485",
+    title = "The Sky Here Is Dark and Gray", points = 5, id=582342, badge="672485",
     description = "Enter Mechanical",
     trigger = (notDemo() && pn(imagePtr(), 0x438a)
          && mechanicalIsAvailableToEnter())
@@ -120,7 +120,7 @@ achievement(
 
 
 achievement(
-    title = "Why's it Always Gotta be...", points = 2,  badge="672641", description = "Get bitten by a snake?", id=592344,
+    title = "Why's It Always Gotta Be...", points = 2,  badge="672641", description = "Get bitten by a snake?", id=592344,
     trigger = notDemo() && pn(interactable(), 0x6d60) && imagePtr() == 0x54f4
 )
 
@@ -157,7 +157,7 @@ achievement(
 function endOfSelenetic() => imagePtr() == 0xe882 && prev(imagePtr()) == 0xe76a && byte(0x1cc1ba) == 0x0d
 
 achievement(
-    title = "Give your Ears a Break", points = 10, id=590877, badge="672487",
+    title = "Give Your Ears a Break", points = 10, id=590877, badge="672487",
     description = "Find your way back from Selenetic",
     trigger = endOfSelenetic() && inSel()
 )
@@ -181,7 +181,7 @@ achievement(
 function stoneshipHasRisen() => byte(0x1cbe00) == 1
 
 achievement(
-    title = "\"Emmit was the first to live on The Rocks.\"", points = 5, id=590878,
+    title = "Emmit Was the First to Live on the Rocks", points = 5, id=590878,
     description = "Enter Stoneship", badge="672489",
     trigger = imagePtr() == 0x0bbc && notDemo() && stoneshipHasRisen() && prev(imagePtr()) == 0x00012cd0
 )
