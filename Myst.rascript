@@ -34,6 +34,7 @@ function inChan() => dword(0x070438) == 0x0ffb570d
 function inSel() => dword(0x070438) == 0x4d4cbfd6
 function inMech() => dword(0x070438) == 0xaeb4b6bb
 function inShip() => dword(0x070438) == 0xabb112a5
+function inDni() => dword(0x070438) == 0x3f146847
 
 
 function returnedToMyst(p) => imagePtr() == 0xabf2 && prev(imagePtr() == p) && inMyst()
@@ -280,7 +281,8 @@ function atBeginningOfGame() {
         bridge == 0 &&
         hour == 0 &&
         minute == 0 &&
-        imagePtr() == 0x2090
+        imagePtr() == 0x2090 &&
+        prev(imagePtr()) == 0x232a
 }
 
 function shouldTickTimer() {
@@ -289,20 +291,25 @@ function shouldTickTimer() {
 
 function shouldStopLeaderboard() => (byte(0x0706c0) == 0x0f || byte(0x0706c0) == 0x11) && !atBeginningOfGame()
 
-leaderboard("Rescue Atrus", "", atBeginningOfGame(), shouldStopLeaderboard(), goodEnding(), shouldTickTimer(), format="FRAMES", lower_is_better=true, id=158019)
+leaderboard("Rescue Atrus", "", 
+    atBeginningOfGame(), 
+    shouldStopLeaderboard(), 
+    goodEnding(), 
+    shouldTickTimer(), 
+    format="FRAMES", 
+    lower_is_better=true, 
+    id=158019)
 
 
 achievement( 
     title = "When Does Riven Come Out?", points = 25, type="missable", id=592334,
     description = "Rescue Atrus in under 8 minutes", badge="672647",
     trigger = 
-        goodEnding() && 
-        disable_when(
-            (
-                once(byte(0x0706c0) == 0x0f) || 
-                once(byte(0x0706c0) == 0x11) || 
-                tally(60 * 60 * 8, shouldTickTimer())),
-            atBeginningOfGame()
-        ) 
+        once(atBeginningOfGame()) &&
+        once(inDni()) &&
+        trigger_when(goodEnding()) && 
+        never(byte(0x0706c0) == 0x0f || 
+                byte(0x0706c0) == 0x11 || 
+                tally(60 * 60 * 8, shouldTickTimer()))
 )
 
